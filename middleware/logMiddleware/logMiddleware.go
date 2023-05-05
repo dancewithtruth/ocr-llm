@@ -4,29 +4,28 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Wave-95/pgserver/middleware/requestid"
 	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/go-chi/chi/middleware"
 )
 
-type responseWriterWithStatusCode struct {
+// logResponseWriter wraps http.ResponseWriter in order to capture the status code and bytes written
+type logResponseWriter struct {
 	http.ResponseWriter
 	statusCode   int
 	bytesWritten int
 }
 
-func (rw *responseWriterWithStatusCode) WriteHeader(statusCode int) {
+// Sets the status code to logResponseWriter when WriteHeader is called in http package
+func (rw *logResponseWriter) WriteHeader(statusCode int) {
 	rw.statusCode = statusCode
 	rw.ResponseWriter.WriteHeader(statusCode)
 }
 
-func (rw *responseWriterWithStatusCode) Write(buf []byte) (int, error) {
-	if n, err := rw.ResponseWriter.Write(buf); err != nil {
-		return 0, err
-	} else {
-		rw.bytesWritten = n
-		return n, err
-	}
+// Sets the bytes written to logResponseWriter when Write is called in http package
+func (rw *logResponseWriter) Write(p []byte) (int, error) {
+	n, err := rw.ResponseWriter.Write(p)
+	rw.bytesWritten = n
+	return n, err
 }
 
 // Middleware injects a logger and builds an http handler. It finds the requestId and correlationId through the
@@ -35,28 +34,25 @@ func Middleware(logger logger.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
-			//Log request ids
 
-			//Log request time using defer
-			// generate an access log message
+			// Get requestid from context and append field to logger
 			ctx := r.Context()
-			requestID, ok := ctx.Value(requestid.RequestIdKey).(string)
+			logger = logger.WithRequestCtx(ctx)
 
-			if ok {
-				logger.Info(requestID)
-			}
-
-			// Wrap the ResponseWriter to capture the status code
-			wrappedWriter := &responseWriterWithStatusCode{
+			// Wrap the ResponseWriter to capture the status code and bytes written
+			wrappedWriter := &logResponseWriter{
 				ResponseWriter: w,
 				statusCode:     http.StatusOK,
+				bytesWritten:   0,
 			}
+
 			next.ServeHTTP(wrappedWriter, r)
+
 			defer func() {
 				logger.
 					WithoutCaller().
-					With("duration", time.Since(start).Milliseconds(), "status", wrappedWriter.statusCode, "bytes written", wrappedWriter.bytesWritten).
-					Infof("%s %s", r.Method, r.URL.Path)
+					With("duration", time.Since(start).Milliseconds(), "bytes written", wrappedWriter.bytesWritten).
+					Infof("%s %s %v", r.Method, r.URL.Path, wrappedWriter.statusCode)
 			}()
 		}
 		return http.HandlerFunc(fn)
