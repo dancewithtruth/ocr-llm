@@ -1,29 +1,33 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/Wave-95/pgserver/api/resource/user"
 	"github.com/Wave-95/pgserver/db"
-	"github.com/Wave-95/pgserver/handlers"
+	"github.com/Wave-95/pgserver/middleware/logMiddleware"
+	"github.com/Wave-95/pgserver/middleware/requestid"
+	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/go-chi/chi"
 )
 
 func main() {
-	fmt.Println("Initiating server")
+	l := logger.New()
 
-	//Connect to DB
-	conn, err := db.Connect()
+	// Initializes database
+	db, err := db.Setup()
 	if err != nil {
-		log.Fatalf("Issue connecting to db: %v\n", err)
+		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer db.Close()
 
-	userRepo := db.NewUserRepo(conn)
 	r := chi.NewRouter()
+	r.Use(requestid.Middleware())
+	r.Use(logMiddleware.Middleware(l))
 
-	r.Get("/user", handlers.UserGet(userRepo))
+	userApi := user.NewUserApi(db, l)
+	userApi.SetupRoutes(r)
 
 	http.ListenAndServe(":8080", r)
 }
