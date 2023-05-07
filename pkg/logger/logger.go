@@ -3,7 +3,7 @@ package logger
 import (
 	"context"
 
-	"github.com/Wave-95/pgserver/middleware/requestid"
+	"github.com/Wave-95/pgserver/middleware/request"
 	"go.uber.org/zap"
 )
 
@@ -60,7 +60,7 @@ func (l *logger) WithRequestCtx(ctx context.Context) Logger {
 
 // withRequestID takes a context to find a request ID and append it to a logger
 func withRequestID(ctx context.Context, l *logger) *logger {
-	if reqId, ok := ctx.Value(requestid.RequestIdKey).(string); ok {
+	if reqId, ok := ctx.Value(request.RequestIdKey).(string); ok {
 		return &logger{l.SugaredLogger.With("requestID", reqId)}
 	}
 	return l

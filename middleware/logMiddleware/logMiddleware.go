@@ -1,11 +1,12 @@
 package logMiddleware
 
 import (
+	"context"
 	"net/http"
 	"time"
 
+	"github.com/Wave-95/pgserver/middleware/request"
 	"github.com/Wave-95/pgserver/pkg/logger"
-	"github.com/go-chi/chi/middleware"
 )
 
 // logResponseWriter wraps http.ResponseWriter in order to capture the status code and bytes written
@@ -28,16 +29,32 @@ func (rw *logResponseWriter) Write(p []byte) (int, error) {
 	return n, err
 }
 
+type RequestLogger int
+
+const RequestLoggerKey RequestLogger = 0
+
 // Middleware injects a logger and builds an http handler. It finds the requestId and correlationId through the
-// request context and add its to the logger. It also starts a timer for the request and logs it out.
+// request context and creates a new logger with those fields. The logger is set to the request context so that
+// it is available to any downstream handler. This middleware starts a timer for the request and logs it out at the end.
 func Middleware(logger logger.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 
-			// Get requestid from context and append field to logger
+			// Get request ID and correlation ID from context and append fields to logger
 			ctx := r.Context()
-			logger = logger.WithRequestCtx(ctx)
+			requestLogger := logger
+			if reqID, ok := ctx.Value(request.RequestIdKey).(string); ok {
+				requestLogger = requestLogger.With("requestID", reqID)
+			}
+			if corrID, ok := ctx.Value(request.CorrelationIdKey).(string); ok {
+				requestLogger = requestLogger.With("correlationID", corrID)
+			}
+
+			// Set logger to request context so that the logger always contains the
+			// request ID and correlation ID
+			ctx = context.WithValue(ctx, RequestLoggerKey, requestLogger)
+			r = r.WithContext(ctx)
 
 			// Wrap the ResponseWriter to capture the status code and bytes written
 			wrappedWriter := &logResponseWriter{
@@ -49,20 +66,12 @@ func Middleware(logger logger.Logger) func(http.Handler) http.Handler {
 			next.ServeHTTP(wrappedWriter, r)
 
 			defer func() {
-				logger.
+				requestLogger.
 					WithoutCaller().
 					With("duration", time.Since(start).Milliseconds(), "bytes written", wrappedWriter.bytesWritten).
 					Infof("%s %s %v", r.Method, r.URL.Path, wrappedWriter.statusCode)
 			}()
 		}
 		return http.HandlerFunc(fn)
-	}
-}
-
-func ReqIdToLogger(r *http.Request) {
-	ctx := r.Context()
-	reqId, ok := ctx.Value(middleware.RequestIDKey).(string)
-	if reqId != "" && ok {
-		//append reqId to logger
 	}
 }
