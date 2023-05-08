@@ -14,9 +14,11 @@ type correlationIdKey int
 type loggerKey int
 
 const (
-	RequestIdKey     requestIdKey     = 0
-	CorrelationIdKey correlationIdKey = 0
-	LoggerKey        loggerKey        = 0
+	RequestIdKey        requestIdKey     = 0
+	CorrelationIdKey    correlationIdKey = 0
+	LoggerKey           loggerKey        = 0
+	HeaderRequestID                      = "X-Request-ID"
+	HeaderCorrelationID                  = "X-Correlation-ID"
 )
 
 // LoggerRW is a wrapper around ResponseWriter meant to capture the status code and number of bytes written
@@ -57,7 +59,7 @@ func RequestLogger(l logger.Logger) func(http.Handler) http.Handler {
 			next.ServeHTTP(lrw, r)
 
 			// Log duration of request
-			l.
+			requestLogger.
 				WithoutCaller().
 				With("duration", time.Since(start).Milliseconds(), "bytes", lrw.BytesWritten).
 				Infof("%s %s StatusCode: %v", r.Method, r.URL.Path, lrw.StatusCode)
@@ -81,11 +83,11 @@ func getOrCreateIDs(r *http.Request) (reqId string, corrId string) {
 
 // getRequestID grabs the request ID string off the X-Request-ID header
 func getRequestID(r *http.Request) string {
-	return r.Header.Get("X-Request-ID")
+	return r.Header.Get(HeaderRequestID)
 }
 
 // getCorrelationId grabs the correlation ID string off the X-Correlation-ID header
 // The correlation id groups together multiple request ids
 func getCorrelationID(r *http.Request) string {
-	return r.Header.Get("X-Correlation-ID")
+	return r.Header.Get(HeaderCorrelationID)
 }

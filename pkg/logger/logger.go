@@ -2,6 +2,7 @@ package logger
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 type Logger interface {
@@ -34,6 +35,13 @@ type logger struct {
 func New() Logger {
 	l, _ := zap.NewProduction()
 	return NewSugar(l)
+}
+
+// Returns a logger and observer for testing
+func NewTest() (Logger, *observer.ObservedLogs) {
+	observedLogs, logObserver := observer.New(zap.InfoLevel)
+	testLogger := zap.New(observedLogs)
+	return NewSugar(testLogger), logObserver
 }
 
 // NewSugar returns a SugaredLogger and implements the Logger interface
