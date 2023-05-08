@@ -18,6 +18,8 @@ type Logger interface {
 	Info(args ...interface{})
 	// Error uses fmt.Sprint to construct and log a message at ERROR level
 	Error(args ...interface{})
+	// Fatal uses fmt.Sprint to construct and log a message, then calls os.Exit.
+	Fatal(args ...interface{})
 
 	// Debugf uses fmt.Sprintf to construct and log a message at DEBUG level
 	Debugf(format string, args ...interface{})
@@ -25,6 +27,8 @@ type Logger interface {
 	Infof(format string, args ...interface{})
 	// Errorf uses fmt.Sprintf to construct and log a message at ERROR level
 	Errorf(format string, args ...interface{})
+	// Fatalf uses fmt.Sprintf to construct and log a message, then calls os.Exit.
+	Fatalf(format string, args ...interface{})
 }
 
 type logger struct {

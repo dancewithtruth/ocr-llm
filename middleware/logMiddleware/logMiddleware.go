@@ -65,12 +65,11 @@ func Middleware(logger logger.Logger) func(http.Handler) http.Handler {
 
 			next.ServeHTTP(wrappedWriter, r)
 
-			defer func() {
-				requestLogger.
-					WithoutCaller().
-					With("duration", time.Since(start).Milliseconds(), "bytes written", wrappedWriter.bytesWritten).
-					Infof("%s %s %v", r.Method, r.URL.Path, wrappedWriter.statusCode)
-			}()
+			// Log time it takes for each request at the end of request
+			requestLogger.
+				WithoutCaller().
+				With("duration", time.Since(start).Milliseconds(), "bytes written", wrappedWriter.bytesWritten).
+				Infof("%s %s %v", r.Method, r.URL.Path, wrappedWriter.statusCode)
 		}
 		return http.HandlerFunc(fn)
 	}
