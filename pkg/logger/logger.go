@@ -1,16 +1,11 @@
 package logger
 
 import (
-	"context"
-
-	"github.com/Wave-95/pgserver/middleware/request"
 	"go.uber.org/zap"
 )
 
 type Logger interface {
 	With(args ...interface{}) Logger
-
-	WithRequestCtx(ctx context.Context) Logger
 
 	WithoutCaller() Logger
 	Debug(args ...interface{})
@@ -54,18 +49,4 @@ func (l *logger) With(args ...interface{}) Logger {
 // WithoutCaller returns a logger that does not output the caller field and location of the calling code.
 func (l *logger) WithoutCaller() Logger {
 	return &logger{l.SugaredLogger.WithOptions(zap.WithCaller(false))}
-}
-
-// WithContext takes in a request context and appends request ID or any other header fields to the logger
-func (l *logger) WithRequestCtx(ctx context.Context) Logger {
-	l = withRequestID(ctx, l)
-	return l
-}
-
-// withRequestID takes a context to find a request ID and append it to a logger
-func withRequestID(ctx context.Context, l *logger) *logger {
-	if reqId, ok := ctx.Value(request.RequestIdKey).(string); ok {
-		return &logger{l.SugaredLogger.With("requestID", reqId)}
-	}
-	return l
 }

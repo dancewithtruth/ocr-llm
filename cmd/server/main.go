@@ -6,8 +6,7 @@ import (
 	"github.com/Wave-95/pgserver/api/resource/user"
 	"github.com/Wave-95/pgserver/db"
 	"github.com/Wave-95/pgserver/internal/config"
-	"github.com/Wave-95/pgserver/middleware/logMiddleware"
-	"github.com/Wave-95/pgserver/middleware/request"
+	"github.com/Wave-95/pgserver/middleware"
 	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/go-chi/chi"
 )
@@ -24,8 +23,7 @@ func main() {
 	defer db.Close()
 
 	r := chi.NewRouter()
-	r.Use(request.Middleware())
-	r.Use(logMiddleware.Middleware(l))
+	r.Use(middleware.RequestLogger(l))
 
 	userApi := user.NewUserApi(db, l)
 	userApi.SetupRoutes(r)
