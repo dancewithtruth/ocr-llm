@@ -9,10 +9,27 @@ import (
 
 func TestNew(t *testing.T) {
 	cfg := New()
+	defaultDBConfig := DatabaseConfig{
+		Host:     defaultDBHost,
+		Port:     defaultDBPort,
+		Name:     defaultDBName,
+		User:     defaultDBUser,
+		Password: defaultDBPW,
+	}
 	assert.Equal(t, cfg.ServerPort, defaultServerPort, "Config should have default server port of 8080")
-	assert.Equal(t, cfg.DSN, buildDBUrl(defaultDBuser, defaultDBpw, defaultDBname, defaultDBPort), "Config should have default DSN")
+	assert.Equal(t, cfg.DatabaseConfig, defaultDBConfig, "Config should have default database config")
 
-	os.Setenv("DB_NAME", "PG_DB")
+	customDBName := "customdbname"
+	customDBPW := "secretpassword"
+	os.Setenv("DB_NAME", customDBName)
+	os.Setenv("DB_PASSWORD", customDBPW)
+	customDBConfig := DatabaseConfig{
+		Host:     defaultDBHost,
+		Port:     defaultDBPort,
+		Name:     customDBName,
+		User:     defaultDBUser,
+		Password: customDBPW,
+	}
 	cfg = New()
-	assert.Equal(t, cfg.DSN, buildDBUrl(defaultDBuser, defaultDBpw, "PG_DB", defaultDBPort), "Config should have DSN with db name from env var")
+	assert.Equal(t, cfg.DatabaseConfig, customDBConfig, "Config should have database config with custom fields")
 }

@@ -17,7 +17,7 @@ func main() {
 	l := logger.New()
 
 	// Initializes database
-	db, err := db.Setup(cfg.DSN)
+	db, err := db.Setup(cfg.DatabaseConfig)
 	if err != nil {
 		l.Fatalf("Issue connecting to db: %s", err)
 	}

@@ -1,46 +1,47 @@
 package config
 
 import (
-	"fmt"
 	"os"
 )
 
 type Config struct {
-	ServerPort string
-	DSN        string
+	ServerPort     string
+	DatabaseConfig DatabaseConfig
+}
+
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	Name     string
+	User     string
+	Password string
 }
 
 const (
 	defaultServerPort = "8080"
-	defaultDBname     = "postgres"
-	defaultDBuser     = "postgres"
-	defaultDBpw       = "postgres"
+	defaultDBName     = "postgres"
+	defaultDBUser     = "postgres"
+	defaultDBPW       = "postgres"
+	defaultDBHost     = "localhost"
 	defaultDBPort     = "5432"
 )
 
 func New() Config {
-	dbuser := os.Getenv("DB_USER")
-	dbpw := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	dbport := os.Getenv("DB_PORT")
-	dsn := buildDBUrl(dbuser, dbpw, dbname, dbport)
+	dbConfig := DatabaseConfig{
+		Host:     getEnv("DB_HOST", defaultDBHost),
+		Port:     getEnv("DB_PORT", defaultDBPort),
+		Name:     getEnv("DB_NAME", defaultDBName),
+		User:     getEnv("DB_USER", defaultDBUser),
+		Password: getEnv("DB_PASSWORD", defaultDBPW),
+	}
 
-	cfg := Config{ServerPort: defaultServerPort, DSN: dsn}
+	cfg := Config{ServerPort: defaultServerPort, DatabaseConfig: dbConfig}
 	return cfg
 }
 
-func buildDBUrl(dbuser, dbpw, dbname, dbport string) string {
-	if dbuser == "" {
-		dbuser = defaultDBuser
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
 	}
-	if dbpw == "" {
-		dbpw = defaultDBpw
-	}
-	if dbname == "" {
-		dbname = defaultDBname
-	}
-	if dbport == "" {
-		dbport = defaultDBPort
-	}
-	return fmt.Sprintf("postgres://%s:%s@localhost:%s/%s", dbuser, dbpw, dbport, dbname)
+	return fallback
 }
