@@ -23,7 +23,7 @@ func (r *userRepository) GetUser() (*models.User, error) {
 	user := models.User{}
 	err := r.db.QueryRow(context.Background(), getUserQuery).Scan(&user.Id, &user.FirstName, &user.LastName)
 	r.l.Info("Getting User")
-	time.Sleep(2 * time.Second)
+	time.Sleep(10 * time.Second)
 	if err != nil {
 		return nil, err
 	}

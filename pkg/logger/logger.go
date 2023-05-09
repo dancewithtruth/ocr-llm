@@ -1,9 +1,15 @@
 package logger
 
 import (
+	"context"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
 )
+
+type loggerKey int
+
+const LoggerKey loggerKey = 0
 
 type Logger interface {
 	With(args ...interface{}) Logger
@@ -57,4 +63,11 @@ func (l *logger) With(args ...interface{}) Logger {
 // WithoutCaller returns a logger that does not output the caller field and location of the calling code.
 func (l *logger) WithoutCaller() Logger {
 	return &logger{l.SugaredLogger.WithOptions(zap.WithCaller(false))}
+}
+
+func FromContext(ctx context.Context) Logger {
+	if l, ok := ctx.Value(LoggerKey).(Logger); ok {
+		return l
+	}
+	return nil
 }

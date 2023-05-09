@@ -11,12 +11,10 @@ import (
 
 type requestIdKey int
 type correlationIdKey int
-type loggerKey int
 
 const (
 	RequestIdKey        requestIdKey     = 0
 	CorrelationIdKey    correlationIdKey = 0
-	LoggerKey           loggerKey        = 0
 	HeaderRequestID                      = "X-Request-ID"
 	HeaderCorrelationID                  = "X-Correlation-ID"
 )
@@ -51,7 +49,7 @@ func RequestLogger(l logger.Logger) func(http.Handler) http.Handler {
 			reqId, corrId := getOrCreateIDs(r)
 			requestLogger := l.With("requestID", reqId, "correlationID", corrId)
 			ctx := r.Context()
-			ctx = context.WithValue(ctx, LoggerKey, requestLogger)
+			ctx = context.WithValue(ctx, logger.LoggerKey, requestLogger)
 			r = r.WithContext(ctx)
 
 			// Wrap rw to make status code and bytes written available
