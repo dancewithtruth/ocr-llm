@@ -26,6 +26,7 @@ const (
 	defaultDBPort     = "5432"
 )
 
+// New loads and returns a config object
 func New() Config {
 	dbConfig := DatabaseConfig{
 		Host:     getEnv("DB_HOST", defaultDBHost),
@@ -39,6 +40,7 @@ func New() Config {
 	return cfg
 }
 
+// getEnv looks up env vars and returns a fallback if not found
 func getEnv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value

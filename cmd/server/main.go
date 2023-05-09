@@ -29,7 +29,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestLogger(l))
 
-	userApi := user.NewUserApi(db, l)
+	userApi := user.NewUserApi(db)
 	userApi.SetupRoutes(r)
 
 	server := &http.Server{
