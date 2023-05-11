@@ -12,14 +12,14 @@ import (
 var ErrUserNotFound = errors.New("user not found")
 
 type Repository interface {
-	GetUser(string) (*models.User, error)
+	GetUser(ctx context.Context, userID string) (*models.User, error)
 }
 
 type userRepository struct {
 	db *pgxpool.Pool
 }
 
-func (r *userRepository) GetUser(userID string) (*models.User, error) {
+func (r *userRepository) GetUser(ctx context.Context, userID string) (*models.User, error) {
 	getUserQuery := "select * from users where id = $1"
 	user := models.User{}
 	err := r.db.QueryRow(context.Background(), getUserQuery, userID).Scan(&user.Id, &user.CreatedAt, &user.UpdatedAt)

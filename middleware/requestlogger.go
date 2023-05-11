@@ -60,7 +60,7 @@ func RequestLogger(l logger.Logger) func(http.Handler) http.Handler {
 			requestLogger.
 				WithoutCaller().
 				With("duration", time.Since(start).Milliseconds(), "bytes", lrw.BytesWritten).
-				Infof("%s %s StatusCode: %v", r.Method, r.URL.Path, lrw.StatusCode)
+				Infof("[STATUS %v] %s: %s", lrw.StatusCode, r.Method, r.URL.Path)
 		})
 	}
 }

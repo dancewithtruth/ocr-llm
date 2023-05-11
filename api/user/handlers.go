@@ -25,17 +25,18 @@ func (r GetUserRequest) Validate(v validator.Validate) error {
 }
 
 func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
-	l := logger.FromContext(r.Context())
+	ctx := r.Context()
+	l := logger.FromContext(ctx)
 	// Validate get user request
 	userID := chi.URLParam(r, "userID")
-	userRequest := GetUserRequest{UserID: userID}
-	if err := userRequest.Validate(*api.Validator); err != nil {
+	input := GetUserRequest{UserID: userID}
+	if err := input.Validate(api.validate); err != nil {
 		http.Error(w, ErrGetUserInvalidRequest.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Get user and handle errors
-	user, err := api.Repo.GetUser(userID)
+	user, err := api.service.GetUser(ctx, input)
 	if err != nil {
 		switch err {
 		case ErrUserNotFound:

@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Wave-95/pgserver/api/resource/user"
+	"github.com/Wave-95/pgserver/api/user"
 	"github.com/Wave-95/pgserver/db"
 	"github.com/Wave-95/pgserver/internal/config"
 	"github.com/Wave-95/pgserver/middleware"
@@ -31,7 +31,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestLogger(l))
 
-	userApi := user.NewUserApi(db, v)
+	userApi := user.NewAPI(db, v)
 	userApi.SetupRoutes(r)
 
 	server := &http.Server{

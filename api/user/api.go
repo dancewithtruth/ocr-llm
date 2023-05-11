@@ -7,14 +7,13 @@ import (
 )
 
 type API struct {
-	//Dependencies stored here
-	Repo      Repository
-	Validator *validator.Validate
+	service  Service
+	validate validator.Validate
 }
 
-func NewUserApi(db *pgxpool.Pool, v *validator.Validate) *API {
-	userRepository := NewUserRepository(db)
-	return &API{Repo: &userRepository, Validator: v}
+func NewAPI(db *pgxpool.Pool, v validator.Validate) *API {
+	userService := NewUserService(db)
+	return &API{service: userService, validate: v}
 }
 
 func (api *API) SetupRoutes(r chi.Router) {
