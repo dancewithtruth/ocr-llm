@@ -16,6 +16,6 @@ func NewAPI(db *pgxpool.Pool, v validator.Validate) *API {
 	return &API{service: userService, validate: v}
 }
 
-func (api *API) SetupRoutes(r chi.Router) {
+func (api *API) RegisterHandlers(r chi.Router) {
 	r.Get("/users/{userID}", api.handleGetUser)
 }

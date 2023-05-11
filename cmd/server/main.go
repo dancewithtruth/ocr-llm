@@ -32,7 +32,7 @@ func main() {
 	r.Use(middleware.RequestLogger(l))
 
 	userApi := user.NewAPI(db, v)
-	userApi.SetupRoutes(r)
+	userApi.RegisterHandlers(r)
 
 	server := &http.Server{
 		Addr:    cfg.ServerPort,
