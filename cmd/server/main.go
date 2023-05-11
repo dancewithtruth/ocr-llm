@@ -13,12 +13,14 @@ import (
 	"github.com/Wave-95/pgserver/internal/config"
 	"github.com/Wave-95/pgserver/middleware"
 	"github.com/Wave-95/pgserver/pkg/logger"
+	"github.com/Wave-95/pgserver/pkg/validator"
 	"github.com/go-chi/chi"
 )
 
 func main() {
 	cfg := config.New()
 	l := logger.New()
+	v := validator.New()
 
 	db, err := db.Setup(cfg.DatabaseConfig)
 	if err != nil {
@@ -29,7 +31,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestLogger(l))
 
-	userApi := user.NewUserApi(db)
+	userApi := user.NewUserApi(db, v)
 	userApi.SetupRoutes(r)
 
 	server := &http.Server{
