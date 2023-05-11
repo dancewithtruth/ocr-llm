@@ -16,5 +16,5 @@ func NewUserApi(db *pgxpool.Pool) *API {
 }
 
 func (api *API) SetupRoutes(r chi.Router) {
-	r.Get("/users", api.handleGetUser)
+	r.Get("/users/{userID}", api.handleGetUser)
 }

@@ -2,24 +2,32 @@ package user
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/Wave-95/pgserver/db/models"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+var ErrUserNotFound = errors.New("user not found")
+
 type Repository interface {
-	GetUser() (*models.User, error)
+	GetUser(string) (*models.User, error)
 }
 
 type userRepository struct {
 	db *pgxpool.Pool
 }
 
-func (r *userRepository) GetUser() (*models.User, error) {
-	getUserQuery := "select * from users order by id desc limit 1"
+func (r *userRepository) GetUser(userID string) (*models.User, error) {
+	getUserQuery := fmt.Sprintf("select * from users where id = '%s'", userID)
 	user := models.User{}
-	err := r.db.QueryRow(context.Background(), getUserQuery).Scan(&user.Id, &user.FirstName, &user.LastName)
+	err := r.db.QueryRow(context.Background(), getUserQuery).Scan(&user.Id, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, ErrUserNotFound
+		}
 		return nil, err
 	}
 	return &user, nil
