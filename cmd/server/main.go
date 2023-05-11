@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Wave-95/pgserver/api/user"
 	"github.com/Wave-95/pgserver/db"
+	"github.com/Wave-95/pgserver/internal/api/user"
 	"github.com/Wave-95/pgserver/internal/config"
 	"github.com/Wave-95/pgserver/middleware"
 	"github.com/Wave-95/pgserver/pkg/logger"
