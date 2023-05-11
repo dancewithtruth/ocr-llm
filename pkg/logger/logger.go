@@ -69,5 +69,5 @@ func FromContext(ctx context.Context) Logger {
 	if l, ok := ctx.Value(LoggerKey).(Logger); ok {
 		return l
 	}
-	return nil
+	return New()
 }

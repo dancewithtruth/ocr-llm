@@ -14,6 +14,7 @@ func Setup(cfg config.DatabaseConfig) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Connected to database")
 	return db, nil
 }
 

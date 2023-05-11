@@ -44,8 +44,8 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, ErrInternalServer.Error(), http.StatusInternalServerError)
 			l.Errorf("Issue getting user: %s", err)
-			return
 		}
+		return
 	}
 
 	// Write user response

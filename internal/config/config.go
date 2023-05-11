@@ -21,7 +21,7 @@ type DatabaseConfig struct {
 
 const (
 	defaultServerPort = ":8080"
-	defaultDBName     = "postgres"
+	defaultDBName     = "pg_db"
 	defaultDBUser     = "postgres"
 	defaultDBPW       = "postgres"
 	defaultDBHost     = "localhost"

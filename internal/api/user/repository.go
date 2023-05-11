@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/Wave-95/pgserver/db/models"
+	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -20,10 +21,12 @@ type userRepository struct {
 }
 
 func (r *userRepository) GetUser(ctx context.Context, userID string) (*models.User, error) {
+	l := logger.FromContext(ctx)
 	getUserQuery := "select * from users where id = $1"
 	user := models.User{}
-	err := r.db.QueryRow(context.Background(), getUserQuery, userID).Scan(&user.Id, &user.CreatedAt, &user.UpdatedAt)
+	err := r.db.QueryRow(ctx, getUserQuery, userID).Scan(&user.Id, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
+		l.Errorf("repository: error getting user: %s", err)
 		if err == pgx.ErrNoRows {
 			return nil, ErrUserNotFound
 		}
@@ -32,6 +35,6 @@ func (r *userRepository) GetUser(ctx context.Context, userID string) (*models.Us
 	return &user, nil
 }
 
-func NewUserRepository(db *pgxpool.Pool) userRepository {
-	return userRepository{db: db}
+func NewUserRepository(db *pgxpool.Pool) Repository {
+	return &userRepository{db: db}
 }
