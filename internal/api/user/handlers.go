@@ -37,7 +37,7 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get user and handle errors
-	user, err := api.service.GetUser(ctx, input)
+	user, err := api.service.GetUser(ctx, input.UserID)
 	if err != nil {
 		switch err {
 		case ErrUserNotFound:

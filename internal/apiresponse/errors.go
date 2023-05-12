@@ -17,8 +17,5 @@ type ErrResponse struct {
 func RespondError(w http.ResponseWriter, statusCode int, err error) {
 	w.WriteHeader(statusCode)
 	errResponse := ErrResponse{err.Error()}
-	err = json.NewEncoder(w).Encode(errResponse)
-	if err != nil {
-		json.NewEncoder(w).Encode(ErrResponse{"Internal Server Error"})
-	}
+	json.NewEncoder(w).Encode(errResponse)
 }
