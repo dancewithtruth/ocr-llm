@@ -65,6 +65,7 @@ func (l *logger) WithoutCaller() Logger {
 	return &logger{l.SugaredLogger.WithOptions(zap.WithCaller(false))}
 }
 
+// FromContext returns a logger from context. If none found, instantiate a new logger
 func FromContext(ctx context.Context) Logger {
 	if l, ok := ctx.Value(LoggerKey).(Logger); ok {
 		return l

@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,4 +30,24 @@ func Test_logger_WithoutCaller(t *testing.T) {
 	logs := observer.All()
 	entry := logs[0]
 	assert.Equal(t, false, entry.Caller.Defined)
+}
+
+func Test_logger_FromContext(t *testing.T) {
+	t.Run("context with logger", func(t *testing.T) {
+		l, observer := NewTest()
+		l = l.With("customArgKey", "customArgValue")
+		ctx := context.WithValue(context.Background(), LoggerKey, l)
+		loggerFromCtx := FromContext(ctx)
+		assert.NotNil(t, loggerFromCtx)
+		loggerFromCtx.Info("Logging to test for customArg field")
+		logs := observer.All()
+		entry := logs[0]
+		fields := entry.Context
+		assert.Equal(t, "customArgKey", fields[0].Key)
+	})
+
+	t.Run("context without logger", func(t *testing.T) {
+		loggerFromCtx := FromContext(context.Background())
+		assert.NotNil(t, loggerFromCtx)
+	})
 }
