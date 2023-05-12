@@ -35,6 +35,7 @@ type GetUserResponse struct {
 func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	l := logger.FromContext(ctx)
+
 	// Validate get user request
 	userID := chi.URLParam(r, "userID")
 	input := GetUserRequest{UserID: userID}
@@ -57,8 +58,13 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Write user response
+	res := GetUserResponse{
+		Id:        user.Id,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(user)
+	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
 		apiresponse.RespondError(w, http.StatusInternalServerError, ErrGetUserEncodeJSON)
 	}
