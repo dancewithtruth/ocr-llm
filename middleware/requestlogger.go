@@ -13,10 +13,16 @@ type requestIdKey int
 type correlationIdKey int
 
 const (
-	RequestIdKey        requestIdKey     = 0
-	CorrelationIdKey    correlationIdKey = 0
-	HeaderRequestID                      = "X-Request-ID"
-	HeaderCorrelationID                  = "X-Correlation-ID"
+	RequestIdKey     requestIdKey     = 0
+	CorrelationIdKey correlationIdKey = 0
+
+	HeaderRequestID     = "X-Request-ID"
+	HeaderCorrelationID = "X-Correlation-ID"
+
+	FieldDuration      = "duration"
+	FieldBytes         = "bytes"
+	FieldRequestID     = "requestID"
+	FieldCorrelationID = "correlationID"
 )
 
 // LoggerRW is a wrapper around ResponseWriter meant to capture the status code and number of bytes written
@@ -47,7 +53,7 @@ func RequestLogger(l logger.Logger) func(http.Handler) http.Handler {
 			// Get request and correlation IDs and append fields to request logger
 			// Then set logger to request context
 			reqId, corrId := getOrCreateIDs(r)
-			requestLogger := l.With("requestID", reqId, "correlationID", corrId)
+			requestLogger := l.With(FieldRequestID, reqId, FieldCorrelationID, corrId)
 			ctx := r.Context()
 			ctx = context.WithValue(ctx, logger.LoggerKey, requestLogger)
 			r = r.WithContext(ctx)
@@ -59,7 +65,7 @@ func RequestLogger(l logger.Logger) func(http.Handler) http.Handler {
 			// Log duration of request
 			requestLogger.
 				WithoutCaller().
-				With("duration", time.Since(start).Milliseconds(), "bytes", lrw.BytesWritten).
+				With(FieldDuration, time.Since(start).Milliseconds(), FieldBytes, lrw.BytesWritten).
 				Infof("[STATUS %v] %s: %s", lrw.StatusCode, r.Method, r.URL.Path)
 		})
 	}

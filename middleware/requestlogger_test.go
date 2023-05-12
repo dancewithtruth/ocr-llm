@@ -23,9 +23,9 @@ func TestRequestLogger(t *testing.T) {
 		entries := observer.All()
 		//TODO: make test not flaky
 		log := entries[0]
-		assert.Equal(t, "requestID", log.Context[0].Key)
-		assert.Equal(t, "correlationID", log.Context[1].Key)
-		assert.Equal(t, "duration", log.Context[2].Key)
+		assert.Equal(t, FieldRequestID, log.Context[0].Key)
+		assert.Equal(t, FieldCorrelationID, log.Context[1].Key)
+		assert.Equal(t, FieldDuration, log.Context[2].Key)
 		assert.Equal(t, "[STATUS 404] GET: /", log.Entry.Message)
 	})
 
