@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/Wave-95/pgserver/internal/apiresponse"
 	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/Wave-95/pgserver/pkg/validator"
 	"github.com/go-chi/chi"
@@ -31,7 +32,7 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	input := GetUserRequest{UserID: userID}
 	if err := input.Validate(api.validate); err != nil {
-		http.Error(w, ErrGetUserInvalidRequest.Error(), http.StatusBadRequest)
+		apiresponse.RespondError(w, http.StatusBadRequest, ErrGetUserInvalidRequest, l)
 		return
 	}
 
@@ -40,9 +41,9 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case ErrUserNotFound:
-			http.Error(w, err.Error(), http.StatusNotFound)
+			apiresponse.RespondError(w, http.StatusNotFound, ErrUserNotFound, l)
 		default:
-			http.Error(w, ErrInternalServer.Error(), http.StatusInternalServerError)
+			apiresponse.RespondError(w, http.StatusInternalServerError, ErrInternalServer, l)
 			l.Errorf("Issue getting user: %s", err)
 		}
 		return
@@ -52,6 +53,6 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		http.Error(w, ErrGetUserEncodeJSON.Error(), http.StatusInternalServerError)
+		apiresponse.RespondError(w, http.StatusInternalServerError, ErrGetUserEncodeJSON, l)
 	}
 }

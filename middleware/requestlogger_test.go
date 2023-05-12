@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,11 +21,12 @@ func TestRequestLogger(t *testing.T) {
 
 		handler.ServeHTTP(rec, req)
 		entries := observer.All()
+		//TODO: make test not flaky
 		log := entries[0]
 		assert.Equal(t, "requestID", log.Context[0].Key)
 		assert.Equal(t, "correlationID", log.Context[1].Key)
 		assert.Equal(t, "duration", log.Context[2].Key)
-		assert.Equal(t, fmt.Sprintf("%s %s StatusCode: %v", "GET", "/", 404), log.Entry.Message)
+		assert.Equal(t, "[STATUS 404] GET: /", log.Entry.Message)
 	})
 
 }

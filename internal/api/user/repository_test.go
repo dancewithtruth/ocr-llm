@@ -4,22 +4,19 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Wave-95/pgserver/db"
-	"github.com/Wave-95/pgserver/internal/config"
+	"github.com/Wave-95/pgserver/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
-	cfg := config.New()
-	db, err := db.Setup(cfg.DatabaseConfig)
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
+	db := test.DB(t)
 	userRepository := NewUserRepository(db)
-
 	ctx := context.Background()
-	_, err = userRepository.GetUser(ctx, "abc-123")
+	t.Run("GetUser", func(t *testing.T) {
+		t.Run("it should return an err if user not found", func(t *testing.T) {
+			_, err := userRepository.GetUser(ctx, "abc-123")
+			assert.Equal(t, ErrUserNotFound, err)
+		})
+	})
 
-	assert.Equal(t, ErrUserNotFound, err)
 }
