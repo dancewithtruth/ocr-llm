@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Wave-95/pgserver/db/models"
+	"github.com/Wave-95/pgserver/internal/models"
 	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

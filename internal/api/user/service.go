@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/Wave-95/pgserver/db/models"
+	"github.com/Wave-95/pgserver/internal/models"
 )
 
 type Service interface {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/Wave-95/pgserver/internal/apiresponse"
 	"github.com/Wave-95/pgserver/pkg/logger"
@@ -23,6 +24,12 @@ type GetUserRequest struct {
 
 func (r GetUserRequest) Validate(v validator.Validate) error {
 	return v.Struct(r)
+}
+
+type GetUserResponse struct {
+	Id        string    `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
