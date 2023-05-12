@@ -32,7 +32,7 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	input := GetUserRequest{UserID: userID}
 	if err := input.Validate(api.validate); err != nil {
-		apiresponse.RespondError(w, http.StatusBadRequest, ErrGetUserInvalidRequest, l)
+		apiresponse.RespondError(w, http.StatusBadRequest, ErrGetUserInvalidRequest)
 		return
 	}
 
@@ -41,9 +41,9 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case ErrUserNotFound:
-			apiresponse.RespondError(w, http.StatusNotFound, ErrUserNotFound, l)
+			apiresponse.RespondError(w, http.StatusNotFound, ErrUserNotFound)
 		default:
-			apiresponse.RespondError(w, http.StatusInternalServerError, ErrInternalServer, l)
+			apiresponse.RespondError(w, http.StatusInternalServerError, ErrInternalServer)
 			l.Errorf("Issue getting user: %s", err)
 		}
 		return
@@ -53,6 +53,6 @@ func (api *API) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		apiresponse.RespondError(w, http.StatusInternalServerError, ErrGetUserEncodeJSON, l)
+		apiresponse.RespondError(w, http.StatusInternalServerError, ErrGetUserEncodeJSON)
 	}
 }

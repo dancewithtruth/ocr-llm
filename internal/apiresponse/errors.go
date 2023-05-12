@@ -2,21 +2,23 @@ package apiresponse
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
-
-	"github.com/Wave-95/pgserver/pkg/logger"
 )
 
-type ErrorResponse struct {
+var (
+	ErrInternalServer = errors.New("Internal Server Error")
+)
+
+type ErrResponse struct {
 	Message string `json:"message"`
 }
 
-func RespondError(w http.ResponseWriter, statusCode int, err error, l logger.Logger) {
+func RespondError(w http.ResponseWriter, statusCode int, err error) {
 	w.WriteHeader(statusCode)
-	errResponse := ErrorResponse{err.Error()}
+	errResponse := ErrResponse{err.Error()}
 	err = json.NewEncoder(w).Encode(errResponse)
 	if err != nil {
-		l.Errorf("Could not encode error response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ErrResponse{"Internal Server Error"})
 	}
 }
