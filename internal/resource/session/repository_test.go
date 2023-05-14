@@ -12,7 +12,7 @@ import (
 
 func TestRepository(t *testing.T) {
 	db := test.DB(t)
-	r := New(db)
+	r := NewRepository(db)
 	assert.NotNil(t, r)
 	sessionID := uuid.New()
 	ipAddress := "127.0.0.1"
@@ -28,7 +28,7 @@ func TestRepository(t *testing.T) {
 	})
 
 	t.Run("GetSession", func(t *testing.T) {
-		t.Run("found", func(t *testing.T) {
+		t.Run("session exists", func(t *testing.T) {
 			session, err := r.GetSession(sessionID)
 			if err != nil {
 				t.Fatalf("got %q, want nil", err)
@@ -36,7 +36,7 @@ func TestRepository(t *testing.T) {
 			assert.Equal(t, session.Id, sessionID)
 		})
 
-		t.Run("not found", func(t *testing.T) {
+		t.Run("session not found", func(t *testing.T) {
 			randomId := uuid.New()
 			_, err := r.GetSession(randomId)
 			assert.ErrorIs(t, err, ErrSessionNotFound)

@@ -9,12 +9,15 @@ import (
 	"time"
 
 	"github.com/Wave-95/pgserver/db"
-	"github.com/Wave-95/pgserver/internal/api/user"
 	"github.com/Wave-95/pgserver/internal/config"
+	"github.com/Wave-95/pgserver/internal/resource/session"
+	"github.com/Wave-95/pgserver/internal/resource/user"
 	"github.com/Wave-95/pgserver/middleware"
 	"github.com/Wave-95/pgserver/pkg/logger"
 	"github.com/Wave-95/pgserver/pkg/validator"
 	"github.com/go-chi/chi"
+	middlewarechi "github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -30,6 +33,8 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestLogger(l))
+	r.Use(middlewarechi.RealIP)
+	r.Use(middleware.Session(createSessionService(db)))
 
 	userApi := user.NewAPI(db, v)
 	userApi.RegisterHandlers(r)
@@ -56,4 +61,9 @@ func main() {
 	if err := server.Shutdown(ctx); err != nil {
 		l.Fatalf("Server forced shutdown: %s", err)
 	}
+}
+
+func createSessionService(db *pgxpool.Pool) session.Service {
+	sessionRepository := session.NewRepository(db)
+	return session.NewService(sessionRepository)
 }

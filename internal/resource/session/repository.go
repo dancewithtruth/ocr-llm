@@ -22,7 +22,7 @@ type Repository interface {
 	DeleteSession(sessionID uuid.UUID) error
 }
 
-func New(db *pgxpool.Pool) Repository {
+func NewRepository(db *pgxpool.Pool) Repository {
 	return &repository{db: db}
 }
 
@@ -61,5 +61,31 @@ func (r *repository) DeleteSession(sessionID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+type mockRepository struct {
+	m map[string]models.Session
+}
+
+func NewMockRepository() mockRepository {
+	m := make(map[string]models.Session)
+	return mockRepository{m}
+}
+
+func (r *mockRepository) CreateSession(session *models.Session) error {
+	r.m[session.Id.String()] = *session
+	return nil
+}
+
+func (r *mockRepository) GetSession(sessionID uuid.UUID) (*models.Session, error) {
+	if session, ok := r.m[sessionID.String()]; ok {
+		return &session, nil
+	}
+	return nil, ErrSessionNotFound
+}
+
+func (r *mockRepository) DeleteSession(sessionID uuid.UUID) error {
+	delete(r.m, sessionID.String())
 	return nil
 }
