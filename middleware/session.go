@@ -17,7 +17,7 @@ func (r CreateSessionRequest) Validate(v validator.Validate) error {
 	return v.Struct(r)
 }
 
-const CookieNameSession = "promptguide_sessionID"
+const CookieNameSession = "dataextract_sessionID"
 
 func Session(service session.Service) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

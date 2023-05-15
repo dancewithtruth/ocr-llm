@@ -1,6 +1,12 @@
 FROM golang:alpine
 
+# Install air
+RUN go install github.com/cosmtrek/air@latest
+
+# Intall go migrate tool
 RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+RUN mkdir main
 
 WORKDIR /app
 
@@ -8,11 +14,13 @@ COPY go.* ./
 RUN go mod download && go mod verify
 
 COPY . .
-COPY ./cmd/server/start.sh .
 
-RUN chmod +x ./start.sh
+#May need to run chmod +x ./start.sh locally if mounting host to container
+RUN chmod +x ./start.sh 
 
-RUN go build -o main ./cmd/server
+RUN go build -o ../main/main ./cmd/server
+
+WORKDIR ../app
 EXPOSE 8080
 
 ENTRYPOINT [ "./start.sh" ] 
