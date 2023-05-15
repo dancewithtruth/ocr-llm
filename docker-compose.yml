@@ -9,6 +9,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_HOST: db #db is started on separate container
       DB_PORT: ${DB_PORT}
+      ENV: ${ENV}
     ports:
       - "8080:8080"
     volumes:
