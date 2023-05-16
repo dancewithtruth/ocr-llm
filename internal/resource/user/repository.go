@@ -35,6 +35,6 @@ func (r *userRepository) GetUser(ctx context.Context, userID string) (*models.Us
 	return &user, nil
 }
 
-func NewUserRepository(db *pgxpool.Pool) Repository {
+func NewRepository(db *pgxpool.Pool) Repository {
 	return &userRepository{db: db}
 }

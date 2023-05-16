@@ -10,13 +10,13 @@ import (
 
 func TestService(t *testing.T) {
 	db := test.DB(t)
-	userRepository := NewUserRepository(db)
-	service := NewUserService(userRepository)
-	assert.NotNil(t, service)
+	userRepository := NewRepository(db)
+	userService := NewService(userRepository)
+	assert.NotNil(t, userService)
 
 	t.Run("GetUser", func(t *testing.T) {
 		t.Run("not found", func(t *testing.T) {
-			_, err := service.GetUser(context.Background(), "abc123")
+			_, err := userService.GetUser(context.Background(), "abc123")
 			assert.ErrorIs(t, err, ErrUserNotFound)
 		})
 

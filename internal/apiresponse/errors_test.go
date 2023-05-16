@@ -7,10 +7,10 @@ import (
 	"testing"
 )
 
-func TestRespondError(t *testing.T) {
+func TestRespondWithError(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		RespondError(w, 500, ErrInternalServer)
+		RespondWithError(w, 500, ErrInternalServer)
 	})
 
 	req := httptest.NewRequest("Get", "/", nil)

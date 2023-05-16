@@ -12,8 +12,8 @@ type API struct {
 }
 
 func NewAPI(db *pgxpool.Pool, v validator.Validate) *API {
-	userRepository := NewUserRepository(db)
-	userService := NewUserService(userRepository)
+	userRepository := NewRepository(db)
+	userService := NewService(userRepository)
 	return &API{service: userService, validate: v}
 }
 

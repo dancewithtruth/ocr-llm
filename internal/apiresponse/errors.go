@@ -14,7 +14,7 @@ type ErrResponse struct {
 	Message string `json:"message"`
 }
 
-func RespondError(w http.ResponseWriter, statusCode int, err error) {
+func RespondWithError(w http.ResponseWriter, statusCode int, err error) {
 	w.WriteHeader(statusCode)
 	errResponse := ErrResponse{err.Error()}
 	json.NewEncoder(w).Encode(errResponse)

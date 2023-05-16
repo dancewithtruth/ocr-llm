@@ -10,6 +10,7 @@ import (
 
 	"github.com/Wave-95/pgserver/db"
 	"github.com/Wave-95/pgserver/internal/config"
+	"github.com/Wave-95/pgserver/internal/resource/extraction"
 	"github.com/Wave-95/pgserver/internal/resource/session"
 	"github.com/Wave-95/pgserver/internal/resource/user"
 	"github.com/Wave-95/pgserver/middleware"
@@ -38,6 +39,9 @@ func main() {
 
 	userApi := user.NewAPI(db, v)
 	userApi.RegisterHandlers(r)
+
+	extractionHandler := extraction.NewHandler(db, v)
+	extractionHandler.RegisterHandlers(r)
 
 	server := &http.Server{
 		Addr:    cfg.ServerPort,

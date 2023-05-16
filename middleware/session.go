@@ -32,15 +32,15 @@ func Session(service session.Service) func(http.Handler) http.Handler {
 				session, err := service.CreateSession(ipAddress)
 				if err != nil {
 					l.Errorf("Issue storing new session: %v", err)
-					apiresponse.RespondError(w, 500, apiresponse.ErrInternalServer)
+					apiresponse.RespondWithError(w, 500, apiresponse.ErrInternalServer)
 				}
 				sessionCookie = &http.Cookie{
 					Name:  CookieNameSession,
 					Value: session.Id.String(),
 				}
 			}
-
 			// Set existing or new cookie to response
+			r.AddCookie(sessionCookie)
 			http.SetCookie(w, sessionCookie)
 			next.ServeHTTP(w, r)
 		})

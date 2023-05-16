@@ -15,6 +15,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/leodido/go-urn v1.2.3 // indirect
 	github.com/otiai10/gosseract/v2 v2.4.0 // indirect
+	github.com/otiai10/openaigo v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/timakin/bodyclose v0.0.0-20230421092635-574207250966 // indirect
 	golang.org/x/mod v0.10.0 // indirect
